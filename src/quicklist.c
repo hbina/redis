@@ -148,11 +148,19 @@ REDIS_STATIC quicklistNode *quicklistCreateNode(void) {
     node->zl = NULL;
     node->count = 0;
     node->sz = 0;
-    node->next = node->prev = NULL;
+    node->xor_ptr = NULL;
     node->encoding = QUICKLIST_NODE_ENCODING_RAW;
     node->container = QUICKLIST_NODE_CONTAINER_ZIPLIST;
     node->recompress = 0;
     return node;
+}
+
+quicklist *quicklistXorNext(quicklist *ql, quicklist *prev) {
+    return (quicklist *)((uintptr_t)ql ^ (uintptr_t)prev);
+}
+
+quicklist *quicklistXorPrev(quicklist *ql, quicklist *next) {
+    return (quicklist *)((uintptr_t)ql ^ (uintptr_t)next);
 }
 
 /* Return cached quicklist count */
@@ -161,12 +169,13 @@ unsigned long quicklistCount(const quicklist *ql) { return ql->count; }
 /* Free entire quicklist. */
 void quicklistRelease(quicklist *quicklist) {
     unsigned long len;
-    quicklistNode *current, *next;
+    quicklistNode *prev, *current, *next;
 
+    prev = NULL;
     current = quicklist->head;
     len = quicklist->len;
     while (len--) {
-        next = current->next;
+        next = quicklistXorNext(current->xor_ptr, prev);
 
         zfree(current->zl);
         quicklist->count -= current->count;
@@ -174,6 +183,7 @@ void quicklistRelease(quicklist *quicklist) {
         zfree(current);
 
         quicklist->len--;
+        prev = current;
         current = next;
     }
     quicklistBookmarksClear(quicklist);
