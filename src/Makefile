@@ -63,6 +63,15 @@ ifneq (,$(findstring armv,$(uname_M)))
 endif
 endif
 
+ifeq ($(USE_COZ),yes)
+    $(info using coz)
+	DEBUG=-gdwarf-4
+	CFLAGS+=-DUSE_COZ
+else
+    $(info not using coz)
+	DEBUG=-g -ggdb
+endif
+
 # Backwards compatibility for selecting an allocator
 ifeq ($(USE_TCMALLOC),yes)
 	MALLOC=tcmalloc
@@ -86,7 +95,6 @@ endif
 FINAL_CFLAGS=$(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS) $(REDIS_CFLAGS)
 FINAL_LDFLAGS=$(LDFLAGS) $(REDIS_LDFLAGS) $(DEBUG)
 FINAL_LIBS=-lm
-DEBUG=-g -ggdb
 
 # Linux ARM needs -latomic at linking time
 ifneq (,$(filter aarch64 armv,$(uname_M)))

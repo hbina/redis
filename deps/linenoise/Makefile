@@ -4,7 +4,7 @@ OPT= -Os
 
 R_CFLAGS= $(STD) $(WARN) $(OPT) $(DEBUG) $(CFLAGS)
 R_LDFLAGS= $(LDFLAGS)
-DEBUG= -g
+DEBUG= -gdwarf-4
 
 R_CC=$(CC) $(R_CFLAGS)
 R_LD=$(CC) $(R_LDFLAGS)
