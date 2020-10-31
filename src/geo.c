@@ -672,9 +672,12 @@ void georadiusGeneric(client *c, int flags) {
     geoArrayFree(ga);
 }
 
+#include <coz.h>
+
 /* GEORADIUS wrapper function. */
 void georadiusCommand(client *c) {
     georadiusGeneric(c, RADIUS_COORDS);
+    COZ_PROGRESS
 }
 
 /* GEORADIUSBYMEMBER wrapper function. */

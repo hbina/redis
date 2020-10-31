@@ -481,12 +481,16 @@ int aeWait(int fd, int mask, long long milliseconds) {
     }
 }
 
+#include <coz.h>
+
 void aeMain(aeEventLoop *eventLoop) {
     eventLoop->stop = 0;
     while (!eventLoop->stop) {
+        COZ_BEGIN(__FILE__)
         aeProcessEvents(eventLoop, AE_ALL_EVENTS|
                                    AE_CALL_BEFORE_SLEEP|
                                    AE_CALL_AFTER_SLEEP);
+        COZ_END(__FILE__)
     }
 }
 
